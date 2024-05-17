@@ -1,4 +1,4 @@
-# Block Puzzle Game
+# Tetris Game
 
 Welcome to the Tetris Game! This is a simple, implementation of the classic Tetris game in python developed as a hobby project.
 (under development)
