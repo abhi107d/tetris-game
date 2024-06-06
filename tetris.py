@@ -52,10 +52,9 @@ def game(frame):
         keys = pygame.key.get_pressed()
         
         
-        if frame % 100==0:
+        if frame % 200==0:
             pass
             game_buff.move_tetromino(keys)
-            game_buff.draw_tetromino()
         frame=frame+1
 
         draw()
