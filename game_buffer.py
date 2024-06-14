@@ -2,6 +2,9 @@ import numpy as np
 import pygame
 import random
 class game_buffer:
+    maxwidth=10
+    maxheight=20
+    LEVEL=10 #(-ve level)
 
     #assets
     tetrominos={
@@ -63,24 +66,32 @@ class game_buffer:
 
 
     def collition(self,x1,y1,rott):
-        s=4
+        bottom_clear=0
+        left_clear=3
+        right_clear=0
         for i in range(4):
             for j in range(4):
                 indx=self.get_index(i,j,rott)
-                x=y1+i
-                y=x1+j
-                test=self.tetrominos[self.current][indx]==1
-                if test and i==3:
-                    s=5
-                if (y>=0 and y<10 and x>=0 and x<20 and 
-                    (self.buffer[x][y]==1 and test)):
-                    return True 
+                y=y1+i
+                x=x1+j
+                block_val=self.tetrominos[self.current][indx]==1
+                #checking for last row/colum of tetramino with
+                # visible block
+                if block_val:
+                    bottom_clear=max(bottom_clear,i)
+                    right_clear=max(right_clear,j)
+                    left_clear=min(left_clear,j)
+                
+                if (x>=0 and x<self.maxwidth 
+                    and y>=0 and y<self.maxheight 
+                    and (self.buffer[y][x]==1 and block_val)):
+                    return [True,True,True] 
+                
+        if (y1+bottom_clear>=self.maxheight):
+            return [True,True,True]
+      
+        return [False,x1+left_clear<0,x1+right_clear>=self.maxwidth]
 
-        
-        if self.y+s>20:
-            return True
-        
-        return False
     
 
 
@@ -88,28 +99,33 @@ class game_buffer:
         for i in range(4):
             for j in range(4):
                 indx=self.get_index(i,j,self.rot)
-                x=self.y+i
-                y=self.x+j
-                if (y>=0 and y<10 and x>=0 and x<20 and 
-                    (self.buffer[x][y]==1 and self.tetrominos[self.current][indx]==1)):
-                    self.buffer[x][y]=0
+                y=self.y+i
+                x=self.x+j
+                if (x>=0 and x<self.maxwidth 
+                    and y>=0 and y<self.maxheight 
+                    and (self.buffer[y][x]==1 and self.tetrominos[self.current][indx]==1)):
+                    self.buffer[y][x]=0
 
 
-
+    frame=0
     def move_tetromino(self,keys):
+        self.frame+=1
+        down=False
         self.clear_block()
-        
-        if keys[pygame.K_a] and not self.collition(self.x-1,self.y+1,self.rot):
+        if(keys[pygame.K_s]):
+            down=True
+        elif (keys[pygame.K_a] 
+            and not self.collition(self.x-1,self.y+1,self.rot)[1]):
             self.x-=1
-            self.y+=1
-        elif keys[pygame.K_d] and not self.collition(self.x+1,self.y+1,self.rot):
-            self.y+=1
+        elif (keys[pygame.K_d] 
+              and not self.collition(self.x+1,self.y+1,self.rot)[2]):
             self.x+=1
-        elif keys[pygame.K_r] and not self.collition(self.x,self.y,(self.rot+1)%4):
-            self.y+=1
+        elif keys[pygame.K_r] and not any(self.collition(self.x,self.y+1,(self.rot+1)%4)):
             self.rot=(self.rot+1)%4
-        elif not self.collition(self.x,self.y+1,self.rot):
-            self.y+=1
+        if not self.collition(self.x,self.y+1,self.rot)[0]:
+            if self.frame%self.LEVEL==0 or down:
+                self.y+=1
+            
         else:
 
             self.draw_tetromino()
@@ -121,15 +137,16 @@ class game_buffer:
 
     
     def draw_tetromino(self):
-
         for i in range(4):
             for j in range(4):
                 indx=self.get_index(i,j,self.rot)
-                x=self.y+i
-                y=self.x+j
-                if (y>=0 and y<10 and x>=0 and x<20 and self.tetrominos[self.current][indx]==1):
+                y=self.y+i
+                x=self.x+j
+                if (x>=0 and x<self.maxwidth 
+                    and y>=0 and y<self.maxheight 
+                    and self.tetrominos[self.current][indx]==1):
 
-                    self.buffer[x][y]=1
+                    self.buffer[y][x]=1
 
     
 

@@ -4,6 +4,7 @@ from sys import exit
 from game_buffer import game_buffer # type: ignore
 W=650
 H=760
+framerate=30
 marginx=150
 marginy=30
 pix_sz=35
@@ -35,11 +36,9 @@ def draw():
                 y=marginy+i*pix_sz
                 rect=pygame.Rect(x,y,pix_sz,pix_sz)
                 pygame.draw.rect(screen,"blue",rect=rect)    
-frame=0
-def game(frame):
-
+def game():
     while(True):
-        clock.tick()
+        clock.tick(framerate)
         pygame.display.update()
         screen.fill((0,0,0))
 
@@ -50,12 +49,7 @@ def game(frame):
             
 
         keys = pygame.key.get_pressed()
-        
-        
-        if frame % 200==0:
-            pass
-            game_buff.move_tetromino(keys)
-        frame=frame+1
+        game_buff.move_tetromino(keys)
 
         draw()
         draw_columns()
@@ -63,7 +57,7 @@ def game(frame):
 
         
             
-game(frame)
+game()
 
 
       
