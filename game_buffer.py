@@ -48,6 +48,8 @@ class game_buffer:
 
     buffer=np.zeros((20, 10), dtype=int)
     rot=0
+    drawrot=0
+    onetap=True
 
     def set_new_tetromino(self):
         self.current=random.randint(1,7)
@@ -120,8 +122,15 @@ class game_buffer:
         elif (keys[pygame.K_d] 
               and not self.collition(self.x+1,self.y+1,self.rot)[2]):
             self.x+=1
-        elif keys[pygame.K_r] and not any(self.collition(self.x,self.y+1,(self.rot+1)%4)):
+        elif keys[pygame.K_r] and not any(self.collition(self.x,self.y+1,(self.rot+1)%4)) and self.onetap:
             self.rot=(self.rot+1)%4
+            self.onetap=False
+        
+        if not keys[pygame.K_r]:
+            self.onetap=True
+                
+
+
         if not self.collition(self.x,self.y+1,self.rot)[0]:
             if self.frame%self.LEVEL==0 or down:
                 self.y+=1

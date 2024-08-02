@@ -46,6 +46,7 @@ def game():
             if event.type==pygame.QUIT:
                 pygame.quit
                 exit()
+
             
 
         keys = pygame.key.get_pressed()
